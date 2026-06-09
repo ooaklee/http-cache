@@ -67,7 +67,7 @@ type Client struct {
 	ttl                     time.Duration
 	refreshKey              string
 	skipCacheResponseHeader string
-	skipCacheUriPathRegex   *regexp.Regexp
+	skipCachePathRegex      *regexp.Regexp
 	methods                 []string
 	writeExpiresHeader      bool
 }
@@ -194,11 +194,11 @@ func (c *Client) cacheableMethod(method string) bool {
 // path
 func (c *Client) cacheableUriPath(requestUrl *url.URL) bool {
 
-	if c.skipCacheUriPathRegex == nil {
+	if c.skipCachePathRegex == nil {
 		return true
 	}
 
-	foundMatchingUriPath := c.skipCacheUriPathRegex.FindString(requestUrl.Path)
+	foundMatchingUriPath := c.skipCachePathRegex.FindString(requestUrl.Path)
 
 	return foundMatchingUriPath == ""
 }
@@ -316,17 +316,6 @@ func ClientWithSkipCacheResponseHeader(headerName string) ClientOption {
 	}
 }
 
-// ClientWithSkipCacheUriPathRegex sets the regex that will be
-// used to ensure that both request/response of matching path
-// is free of cache.
-// Optional setting.
-func ClientWithSkipCacheUriPathRegex(uriPathRegex *regexp.Regexp) ClientOption {
-	return func(c *Client) error {
-		c.skipCacheUriPathRegex = uriPathRegex
-		return nil
-	}
-}
-
 // ClientWithMethods sets the acceptable HTTP methods to be cached.
 // Optional setting. If not set, default is "GET".
 func ClientWithMethods(methods []string) ClientOption {
@@ -337,6 +326,15 @@ func ClientWithMethods(methods []string) ClientOption {
 			}
 		}
 		c.methods = methods
+		return nil
+	}
+}
+
+// ClientWithSkipCacheURIPathRegex skips cache lookup and storage for matching
+// request URL paths.
+func ClientWithSkipCacheURIPathRegex(pathRegex *regexp.Regexp) ClientOption {
+	return func(c *Client) error {
+		c.skipCachePathRegex = pathRegex
 		return nil
 	}
 }
