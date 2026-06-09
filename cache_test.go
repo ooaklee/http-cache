@@ -85,7 +85,7 @@ func TestMiddleware(t *testing.T) {
 		ClientWithRefreshKey("rk"),
 		ClientWithMethods([]string{http.MethodGet, http.MethodPost}),
 		ClientWithSkipCacheResponseHeader("X-Skip"),
-		ClientWithSkipCacheUriPathRegex(exampleRegex),
+		ClientWithSkipCacheURIPathRegex(exampleRegex),
 	)
 
 	handlers := http.ServeMux{}
